@@ -31,8 +31,11 @@ public class Sandbox extends JPanel {
     }
 
     public void initializeWorld() {
-        world.addBody(new Square(10, 10, 0, 0));
-        world.addBody(new Square(20, 10, 20, 40));
+        Square s1 = new Square(10, 10, 0, 0);
+        s1.setImmovable(true);
+        world.addBody(s1);
+        world.addBody(new Square(20, 10, 0, 40));
+        world.addBody(new Square(50, 50, 30, 0));
 
     }
 
@@ -57,7 +60,7 @@ public class Sandbox extends JPanel {
     private void drawShapes(Graphics2D g2) {
         for (Body body : world.getBodies()) {
             if (body instanceof Square square) {
-                g2.drawRect((int) square.getX(),  (int) square.getY(), (int) square.getSize(), (int) square.getSize());
+                g2.drawRect((int) square.getSx(),  (int) square.getSy(), (int) square.getSize(), (int) square.getSize());
             }
         }
     }

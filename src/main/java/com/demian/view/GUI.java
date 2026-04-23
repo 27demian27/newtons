@@ -1,6 +1,7 @@
 package com.demian.view;
 
 import com.demian.physics.World;
+import com.demian.simulation.Simulation;
 
 import javax.swing.*;
 import java.awt.*;
@@ -8,13 +9,17 @@ import java.awt.*;
 public class GUI {
 
     private final JFrame frame;
+    private final World world;
+    private final Sandbox sandbox;
 
     public GUI(World world) {
+        this.world = world;
+
         frame = new JFrame("Sandbox");
         frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         frame.setLayout(new BorderLayout());
 
-        Sandbox sandbox = new Sandbox(world);
+        sandbox = new Sandbox(world);
         sandbox.configure();
         sandbox.initializeWorld();
 
@@ -26,5 +31,10 @@ public class GUI {
 
     public void show() {
         frame.setVisible(true);
+    }
+
+    public void startSimulation() {
+        Thread.ofPlatform().start(new Simulation(world, sandbox));
+
     }
 }

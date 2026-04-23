@@ -1,6 +1,7 @@
 package com.demian;
 
 import com.demian.physics.World;
+import com.demian.simulation.Simulation;
 import com.demian.view.GUI;
 
 import javax.swing.*;
@@ -11,6 +12,7 @@ public class Main {
         SwingUtilities.invokeLater(() -> {
             GUI gui = new GUI(world);
             gui.show();
+            gui.startSimulation();
         });
     }
 }
