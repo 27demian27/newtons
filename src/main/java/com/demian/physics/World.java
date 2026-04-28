@@ -1,5 +1,6 @@
 package com.demian.physics;
 
+import com.demian.physics.rigidbody.Body;
 import com.demian.physics.util.Collisions;
 import lombok.Getter;
 
@@ -17,9 +18,10 @@ public class World {
         bodies = new ArrayList<>();
     }
 
-    public void updateBodiesPosition() {
+    public void updateBodiesPosition(float dt) {
         for (Body body : bodies) {
-            body.update(1f/60);
+            body.update(dt);
+//            System.out.println(body + ": " +body.getX() + ", "+body.getY());
         }
     }
 

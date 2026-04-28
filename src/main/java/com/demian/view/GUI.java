@@ -11,21 +11,24 @@ public class GUI {
     private final JFrame frame;
     private final World world;
     private final Sandbox sandbox;
+    private final Simulation simulation;
 
     public GUI(World world) {
         this.world = world;
+
+        simulation = new Simulation(world);
 
         frame = new JFrame("Sandbox");
         frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         frame.setLayout(new BorderLayout());
 
-        sandbox = new Sandbox(world);
+        sandbox = new Sandbox(world, simulation);
         sandbox.configure();
         sandbox.initializeWorld();
 
         frame.add(sandbox, BorderLayout.CENTER);
 
-        frame.setSize(800, 800);
+        frame.setSize(1920, 1080);
         frame.setLocationRelativeTo(null);
     }
 
@@ -34,7 +37,14 @@ public class GUI {
     }
 
     public void startSimulation() {
-        Thread.ofPlatform().start(new Simulation(world, sandbox));
+        Thread.ofPlatform().start(simulation);
 
+    }
+    public void startPainting() {
+        Timer timer = new Timer(16, e -> {
+            sandbox.repaint();
+        });
+        timer.setCoalesce(false);
+        timer.start();
     }
 }
