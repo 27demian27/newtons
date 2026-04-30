@@ -12,6 +12,15 @@ public class Vector2D {
         this.y = y;
     }
 
+    public Vector2D(Vector2D vec) {
+        this.x = vec.x;
+        this.y = vec.y;
+    }
+
+    public static double dot(Vector2D vec1, Vector2D vec2) {
+        return vec1.x * vec2.x + vec1.y * vec2.y;
+    }
+
     public double getAngle() {
         return Math.atan2(y, x);
     }
@@ -41,7 +50,16 @@ public class Vector2D {
         return new Vector2D(x + vec.x, y + vec.y);
     }
 
+    @Override
     public String toString() {
         return "(" + x + ", " + y + ")";
+    }
+
+    @Override
+    public boolean equals(Object obj) {
+        if (obj instanceof Vector2D vec) {
+            return (this.x == vec.x && this.y == vec.y);
+        }
+        return false;
     }
 }

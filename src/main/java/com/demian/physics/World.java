@@ -1,11 +1,15 @@
 package com.demian.physics;
 
 import com.demian.physics.rigidbody.Body;
+import com.demian.physics.rigidbody.shapes.Rect;
+import com.demian.physics.util.CollisionData;
 import com.demian.physics.util.Collisions;
 import lombok.Getter;
 
 import java.util.ArrayList;
+import java.util.LinkedHashSet;
 import java.util.List;
+import java.util.Set;
 
 public class World {
 
@@ -21,17 +25,18 @@ public class World {
     public void updateBodiesPosition(float dt) {
         for (Body body : bodies) {
             body.update(dt);
-//            System.out.println(body + ": " +body.getX() + ", "+body.getY());
         }
     }
 
     public void checkCollisions() {
-        for (Body body1 : bodies) {
-            if (body1 instanceof Collidable collidable1) {
-                for (Body body2 : bodies) {
-                    if (body1 != body2 && body2 instanceof Collidable collidable2) {
-                        if (collidable1.collision(collidable2))
-                            Collisions.resolveCollision((Body) collidable1, (Body) collidable2);
+
+        for (int i = 0; i < bodies.size(); i++) {
+            for (int j = i + 1; j < bodies.size(); j++) {
+                if (bodies.get(i) instanceof Rect rect1 && bodies.get(j) instanceof Rect rect2) {
+                    CollisionData collision = Collisions.rectRect(rect1, rect2);
+                    if (collision.colliding) {
+                        Collisions.resolveCollision(rect1, rect2, collision);
+                        Collisions.correctPosition(rect1, rect2, collision);
                     }
                 }
             }

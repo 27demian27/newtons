@@ -2,7 +2,7 @@ package com.demian.view;
 
 import com.demian.physics.rigidbody.Body;
 import com.demian.physics.World;
-import com.demian.physics.rigidbody.shapes.Square;
+import com.demian.physics.rigidbody.shapes.Rect;
 import com.demian.physics.util.Vector2D;
 import com.demian.simulation.Simulation;
 
@@ -38,12 +38,16 @@ public class Sandbox extends JPanel {
     }
 
     public void initializeWorld() {
-        Square s1 = new Square(10, 10, 0, 0);
-        s1.setImmovable(true);
-        world.addBody(s1);
-        world.addBody(new Square(20, 10, 0, 40));
-        world.addBody(new Square(50, 50, 30, 0));
+        Rect s1 = new Rect(Double.POSITIVE_INFINITY, -1_000_000, -10, 2_000_000, 10);
 
+        world.addBody(s1);
+        world.addBody(new Rect(10, 0, 40, 10, 10));
+        world.addBody(new Rect(10, 0, 80, 10, 10));
+        world.addBody(new Rect(10, 0, 120, 10, 10));
+        world.addBody(new Rect(1, 0, 50, 10, 1));
+
+        world.addBody(new Rect(10, 50, 0, 10, 10));
+        world.addBody(new Rect(10, 50, 10, 10, 10));
     }
 
     @Override
@@ -62,23 +66,27 @@ public class Sandbox extends JPanel {
         g2.scale(scale, -scale);
 
         g2.setColor(Color.BLACK);
-        g2.setStroke(axisLinesStroke);
-        g2.drawLine(-1_000_000, 0, 1_000_000, 0);
-        g2.drawLine(0, -1_000_000, 0, 1_000_000);
 
 
 
         drawShapes(g2);
+        drawOverlay(g2);
         drawDirectionVecs(g2);
 
         Toolkit.getDefaultToolkit().sync();
     }
 
+    private void drawOverlay(Graphics2D g2) {
+        g2.setStroke(axisLinesStroke);
+        g2.drawLine(-1_000_000, 0, 1_000_000, 0);
+        g2.drawLine(0, -1_000_000, 0, 1_000_000);
+    }
+
     private void drawShapes(Graphics2D g2) {
         g2.setStroke(bodyStroke);
         for (Body body : world.getBodies()) {
-            if (body instanceof Square square) {
-                g2.drawRect((int) square.getX(),  (int) square.getY(), (int) square.getSize(), (int) square.getSize());
+            if (body instanceof Rect rect) {
+                g2.drawRect((int) rect.getX(),  (int) rect.getY(), (int) rect.getWidth(), (int) rect.getHeight());
             }
         }
     }
@@ -86,12 +94,16 @@ public class Sandbox extends JPanel {
     private void drawDirectionVecs(Graphics2D g2) {
         g2.setStroke(bodyStroke);
         for (Body body : world.getBodies()) {
+            if (Double.isInfinite(body.getMass()))
+                continue;
+
             Vector2D center = body.getCenterOfMass();
-            Vector2D direction = body.getDirection_vec().scale(body.getMass());
+            Vector2D direction = body.getVelocity_vec()
+                    .normalized()
+                    .scale(Math.clamp(body.getVelocity_vec().getLength(), 0, 20));
+
             Vector2D normal = direction.rotate(Math.PI / 2.0).normalized();
 
-            int centerX = toInt(center.x);
-            int centerY = toInt(center.y);
             int endX = toInt(center.x + direction.x);
             int endY = toInt(center.y + direction.y);
             int crossLength = toInt(direction.getLength() / 10);
@@ -102,31 +114,18 @@ public class Sandbox extends JPanel {
             Vector2D arrowVec2 = crossOrigin.add(normalScaled);
 
             g2.drawLine(
-                    centerX,
-                    centerY,
+                    toInt(center.x),
+                    toInt(center.y),
                     toInt(crossOrigin.x),
                     toInt(crossOrigin.y)
             );
 
-            g2.drawLine(
-                    endX,
-                    endY,
-                    toInt(arrowVec1.x),
-                    toInt(arrowVec1.y)
-            );
-            g2.drawLine(
-                    endX,
-                    endY,
-                    toInt(arrowVec2.x),
-                    toInt(arrowVec2.y)
+            g2.fillPolygon(
+                    new int[]{endX, toInt(arrowVec1.x), toInt(arrowVec2.x)},
+                    new int[]{endY, toInt(arrowVec1.y), toInt(arrowVec2.y)},
+                    3
             );
 
-            g2.drawLine(
-                    toInt(crossOrigin.x - normalScaled.x),
-                    toInt(crossOrigin.y - normalScaled.y),
-                    toInt(crossOrigin.x + normalScaled.x),
-                    toInt(crossOrigin.y + normalScaled.y)
-            );
 
         }
     }

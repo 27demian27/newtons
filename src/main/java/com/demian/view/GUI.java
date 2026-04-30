@@ -28,7 +28,7 @@ public class GUI {
 
         frame.add(sandbox, BorderLayout.CENTER);
 
-        frame.setSize(1920, 1080);
+        frame.setSize(1280, 720);
         frame.setLocationRelativeTo(null);
     }
 
