@@ -20,6 +20,11 @@ public class Rect extends Body {
     }
 
     @Override
+    public boolean contains(double x, double y) {
+        return ((x > this.x && x < this.x + width) && (y > this.y && y < this.y + height));
+    }
+
+    @Override
     public Vector2D getCenterOfMass() {
         return new Vector2D(x + width / 2.0, y + height / 2.0);
     }
@@ -27,6 +32,9 @@ public class Rect extends Body {
     @Override
     protected double getReferenceArea() {
         double e = 0.0001;
+
+        if (velocity_vec.getLength() == 0.0) return 0.0;
+
         if (velocity_vec.normalized().x > -e && velocity_vec.normalized().x < e)
             return width;
         if (velocity_vec.normalized().y > -e && velocity_vec.normalized().y < e)

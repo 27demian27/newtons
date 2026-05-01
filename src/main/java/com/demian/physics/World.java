@@ -9,6 +9,7 @@ import lombok.Getter;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 
 public class World {
 
@@ -66,6 +67,13 @@ public class World {
         }
     }
 
+    public Optional<Body> findBody(double x, double y) {
+        for (Body body : bodies) {
+            if (body.contains(x, y)) return Optional.of(body);
+        }
+
+        return Optional.empty();
+    }
 
     public void addBody(Body body) {
         bodies.add(body);

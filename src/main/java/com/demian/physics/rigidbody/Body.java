@@ -67,6 +67,8 @@ public abstract class Body {
 
     }
 
+    public abstract boolean contains(double x, double y);
+
     /**
      * Calculates and gets center of mass for a uniformly dense rigid body.
      * @return Vector2D point where center of mass resides
