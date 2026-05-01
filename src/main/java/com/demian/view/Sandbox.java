@@ -54,7 +54,8 @@ public class Sandbox extends JPanel {
         c2.setVelocity_vec(new Vector2D(50, 50));
         Circle c3 = new Circle(10, -50, 100, 10);
         Circle c4 = new Circle(10, -50, 50, 10);
-        world.addBodies(c3, c4);
+        Rect r1 = new Rect(10, 300, 300, 100, 20);
+        world.addBodies(c3, c4, r1);
     }
 
     @Override
@@ -85,6 +86,7 @@ public class Sandbox extends JPanel {
 
     private void drawOverlay(Graphics2D g2) {
         g2.setStroke(axisLinesStroke);
+        g2.setColor(Color.BLACK);
         g2.drawLine(-1_000_000, 0, 1_000_000, 0);
         g2.drawLine(0, -1_000_000, 0, 1_000_000);
     }
@@ -100,6 +102,8 @@ public class Sandbox extends JPanel {
                 else {
                     g2.setColor(Color.BLACK);
                     g2.drawRect((int) rect.getX(),  (int) rect.getY(), (int) rect.getWidth(), (int) rect.getHeight());
+                    g2.setColor(Color.RED);
+                    g2.drawLine((int) rect.getX(), (int) rect.getY(), (int) rect.getX(), (int) rect.getY());
                 }
             } else if (body instanceof Circle circle) {
                 g2.setColor(Color.BLACK);
@@ -109,12 +113,15 @@ public class Sandbox extends JPanel {
                         (int) (circle.radius * 2),
                         (int) (circle.radius * 2)
                 );
+                g2.setColor(Color.RED);
+                g2.drawLine((int) circle.getX(), (int) (circle.getY() + circle.radius), (int) circle.getX(), (int) (circle.getY() + circle.radius));
             }
         }
     }
 
     private void drawDirectionVecs(Graphics2D g2) {
         g2.setStroke(bodyStroke);
+        g2.setColor(Color.BLACK);
         for (Body body : world.getBodies()) {
             if (Double.isInfinite(body.getMass()))
                 continue;

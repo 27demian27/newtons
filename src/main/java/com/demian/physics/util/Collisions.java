@@ -18,11 +18,6 @@ public class Collisions {
                         Math.max(collisionData.penetration - slop, 0) / (1/body1.mass + 1/body2.mass)
         );
 
-        System.out.println("Resolving collision...");
-        System.out.println("body1: [" +body1.getX() + ", " +body1.getY() +"], body2: [" + body2.getX() + ", " + body2.getY() + "]");
-        System.out.println(collisionData);
-        System.out.println("correction: "+ correction);
-
         double ivMass1 = (1/body1.mass) / (1/body1.mass + 1/body2.mass);
         body1.setX(body1.getX() + correction.x * ivMass1);
         body1.setY(body1.getY() + correction.y * ivMass1);

@@ -8,13 +8,12 @@ import com.demian.physics.util.Collisions;
 import lombok.Getter;
 
 import java.util.ArrayList;
-import java.util.LinkedHashSet;
 import java.util.List;
-import java.util.Set;
 
 public class World {
 
     public final static double GRAVITY_CONSTANT = -9.81;
+    public final static double AIR_DENSITY = 1.225;
 
     @Getter
     private List<Body> bodies;
