@@ -10,4 +10,9 @@ public class CollisionData {
         this.normal = normal;
         this.penetration = penetration;
     }
+
+    @Override
+    public String toString() {
+        return getClass() + "\ncolliding: " + colliding + "\nnormal: " + normal + "\npenetration: " + penetration;
+    }
 }

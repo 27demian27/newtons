@@ -47,7 +47,6 @@ public abstract class Body {
         x = x + velocity_vec.x * dt;
         y = y + velocity_vec.y * dt;
 
-        System.out.println("[" + x + ", " + y + "]");
     }
 
     /**

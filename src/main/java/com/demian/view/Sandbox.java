@@ -2,6 +2,7 @@ package com.demian.view;
 
 import com.demian.physics.rigidbody.Body;
 import com.demian.physics.World;
+import com.demian.physics.rigidbody.shapes.Circle;
 import com.demian.physics.rigidbody.shapes.Rect;
 import com.demian.physics.util.Vector2D;
 import com.demian.simulation.Simulation;
@@ -24,7 +25,7 @@ public class Sandbox extends JPanel {
     private Point lastDragPoint;
     private boolean initialized;
 
-    private final static Stroke axisLinesStroke = new BasicStroke(0.20f);
+    private final static Stroke axisLinesStroke = new BasicStroke(0.20f, BasicStroke.CAP_BUTT, BasicStroke.JOIN_MITER, 10.0f, new float[]{1.0f}, 0.0f);
     private final static Stroke bodyStroke = new BasicStroke(0.50f);
 
     public Sandbox(World world, Simulation simulation) {
@@ -38,16 +39,22 @@ public class Sandbox extends JPanel {
     }
 
     public void initializeWorld() {
-        Rect s1 = new Rect(Double.POSITIVE_INFINITY, -1_000_000, -10, 2_000_000, 10);
+        Rect ground = new Rect(Double.POSITIVE_INFINITY, -1_000_000, -1_000_000, 2_000_000, 1_000_000);
+        world.addBody(ground);
+        Rect wallLeft = new Rect(Double.POSITIVE_INFINITY, -1_000_000, -1_000_000, 999_900, 2_000_000);
+        world.addBody(wallLeft);
+        Rect wallRight = new Rect(Double.POSITIVE_INFINITY, 400, -1_000_000, 999_600, 2_000_000);
+        world.addBody(wallRight);
+        Rect ceiling = new Rect(Double.POSITIVE_INFINITY, -1_000_000, 400, 2_000_000, 999_600);
+        world.addBody(ceiling);
 
-        world.addBody(s1);
-        world.addBody(new Rect(10, 0, 40, 10, 10));
-        world.addBody(new Rect(10, 0, 80, 10, 10));
-        world.addBody(new Rect(10, 0, 120, 10, 10));
-        world.addBody(new Rect(1, 0, 50, 10, 1));
-
-        world.addBody(new Rect(10, 50, 0, 10, 10));
-        world.addBody(new Rect(10, 50, 10, 10, 10));
+        Circle c1 = new Circle(10, 360, 360, 20);
+        c1.setVelocity_vec(new Vector2D(-50, -50));
+        Circle c2 = new Circle(10, 0, 0, 20);
+        c2.setVelocity_vec(new Vector2D(50, 50));
+        Circle c3 = new Circle(10, -50, 100, 10);
+        Circle c4 = new Circle(10, -50, 50, 10);
+        world.addBodies(c3, c4);
     }
 
     @Override
@@ -86,7 +93,22 @@ public class Sandbox extends JPanel {
         g2.setStroke(bodyStroke);
         for (Body body : world.getBodies()) {
             if (body instanceof Rect rect) {
-                g2.drawRect((int) rect.getX(),  (int) rect.getY(), (int) rect.getWidth(), (int) rect.getHeight());
+                if (body.isImmovable()) {
+                    g2.setColor(Color.GRAY);
+                    g2.fillRect((int) rect.getX(),  (int) rect.getY(), (int) rect.getWidth(), (int) rect.getHeight());
+                }
+                else {
+                    g2.setColor(Color.BLACK);
+                    g2.drawRect((int) rect.getX(),  (int) rect.getY(), (int) rect.getWidth(), (int) rect.getHeight());
+                }
+            } else if (body instanceof Circle circle) {
+                g2.setColor(Color.BLACK);
+                g2.drawOval(
+                        (int) circle.getX(),
+                        (int) circle.getY(),
+                        (int) (circle.radius * 2),
+                        (int) (circle.radius * 2)
+                );
             }
         }
     }
