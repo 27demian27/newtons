@@ -12,8 +12,13 @@ import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
+import java.awt.geom.Ellipse2D;
+import java.awt.geom.Line2D;
+import java.awt.geom.Path2D;
+import java.awt.geom.Rectangle2D;
+import java.util.Optional;
 
-public class Sandbox extends JPanel {
+public class Sandbox extends JLayeredPane {
 
     private final World world;
     private final Simulation simulation;
@@ -25,8 +30,14 @@ public class Sandbox extends JPanel {
     private Point lastDragPoint;
     private boolean initialized;
 
-    private final static Stroke axisLinesStroke = new BasicStroke(0.20f, BasicStroke.CAP_BUTT, BasicStroke.JOIN_MITER, 10.0f, new float[]{1.0f}, 0.0f);
-    private final static Stroke bodyStroke = new BasicStroke(0.50f);
+    private final Cursor defaultCursor =  new Cursor(Cursor.DEFAULT_CURSOR);
+    private final Cursor panningCursor =  new Cursor(Cursor.MOVE_CURSOR);
+    private final Stroke axisLinesStroke = new BasicStroke(0.20f, BasicStroke.CAP_BUTT, BasicStroke.JOIN_MITER, 10.0f, new float[]{1.0f}, 0.0f);
+    private final Stroke bodyStroke = new BasicStroke(0.50f);
+
+    private boolean showBodyDataPanel;
+    private BodyDataPanel bodyDataPanel;
+    private Body selectedBody;
 
     public Sandbox(World world, Simulation simulation) {
         this.world = world;
@@ -36,6 +47,8 @@ public class Sandbox extends JPanel {
         translateX = 0.0;
         translateY = 0.0;
         initialized = false;
+        showBodyDataPanel = false;
+        selectedBody = null;
     }
 
     public void initializeWorld() {
@@ -63,6 +76,9 @@ public class Sandbox extends JPanel {
         super.paintComponent(g);
         Graphics2D g2 = (Graphics2D) g.create();
 
+        g2.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
+        g2.setRenderingHint(RenderingHints.KEY_STROKE_CONTROL, RenderingHints.VALUE_STROKE_PURE);
+
         if (!initialized) {
             scale = scale * 2.0;
             translateX = getWidth() / 2.0;
@@ -81,40 +97,68 @@ public class Sandbox extends JPanel {
         drawOverlay(g2);
         drawDirectionVecs(g2);
 
+        if (showBodyDataPanel) bodyDataPanel.update();
+
         Toolkit.getDefaultToolkit().sync();
     }
 
     private void drawOverlay(Graphics2D g2) {
         g2.setStroke(axisLinesStroke);
         g2.setColor(Color.BLACK);
+
         g2.drawLine(-1_000_000, 0, 1_000_000, 0);
         g2.drawLine(0, -1_000_000, 0, 1_000_000);
     }
 
     private void drawShapes(Graphics2D g2) {
         g2.setStroke(bodyStroke);
+
         for (Body body : world.getBodies()) {
             if (body instanceof Rect rect) {
+
+
+                Rectangle2D.Double shape = new Rectangle2D.Double(
+                        rect.getX(),
+                        rect.getY(),
+                        rect.getWidth(),
+                        rect.getHeight()
+                );
+
                 if (body.isImmovable()) {
                     g2.setColor(Color.GRAY);
-                    g2.fillRect((int) rect.getX(),  (int) rect.getY(), (int) rect.getWidth(), (int) rect.getHeight());
-                }
-                else {
+                    g2.fill(shape);
+                } else {
+                    if (body == selectedBody) {
+                        Stroke oldStroke = g2.getStroke();
+
+                        g2.setColor(new Color(163, 216, 230));
+                        g2.setStroke(new BasicStroke(2.5f));
+                        g2.draw(shape);
+
+                        g2.setStroke(oldStroke);
+                    }
                     g2.setColor(Color.BLACK);
-                    g2.drawRect((int) rect.getX(),  (int) rect.getY(), (int) rect.getWidth(), (int) rect.getHeight());
-                    g2.setColor(Color.RED);
-                    g2.drawLine((int) rect.getX(), (int) rect.getY(), (int) rect.getX(), (int) rect.getY());
+                    g2.draw(shape);
                 }
             } else if (body instanceof Circle circle) {
+
+                double x = circle.getX();
+                double y = circle.getY();
+                double d = circle.radius * 2.0;
+
+                Ellipse2D.Double shape = new Ellipse2D.Double(x, y, d, d);
+
+                if (body == selectedBody) {
+                    Stroke oldStroke = g2.getStroke();
+
+                    g2.setColor(new Color(163, 216, 230));
+                    g2.setStroke(new BasicStroke(1.5f));
+                    g2.draw(shape);
+
+                    g2.setStroke(oldStroke);
+                }
                 g2.setColor(Color.BLACK);
-                g2.drawOval(
-                        (int) circle.getX(),
-                        (int) circle.getY(),
-                        (int) (circle.radius * 2),
-                        (int) (circle.radius * 2)
-                );
-                g2.setColor(Color.RED);
-                g2.drawLine((int) circle.getX(), (int) (circle.getY() + circle.radius), (int) circle.getX(), (int) (circle.getY() + circle.radius));
+                g2.draw(shape);
             }
         }
     }
@@ -122,59 +166,61 @@ public class Sandbox extends JPanel {
     private void drawDirectionVecs(Graphics2D g2) {
         g2.setStroke(bodyStroke);
         g2.setColor(Color.BLACK);
+
         for (Body body : world.getBodies()) {
             if (Double.isInfinite(body.getMass()))
                 continue;
 
             Vector2D center = body.getCenterOfMass();
-            Vector2D direction = body.getVelocity_vec()
+            Vector2D velocity = body.getVelocity_vec();
+
+            if (velocity.getLength() == 0)
+                continue;
+
+            Vector2D direction = velocity
                     .normalized()
-                    .scale(Math.clamp(body.getVelocity_vec().getLength(), 0, 20));
+                    .scale(Math.clamp(velocity.getLength(), 0, 20));
 
             Vector2D normal = direction.rotate(Math.PI / 2.0).normalized();
 
-            int endX = toInt(center.x + direction.x);
-            int endY = toInt(center.y + direction.y);
-            int crossLength = toInt(direction.getLength() / 10);
+            double endX = center.x + direction.x;
+            double endY = center.y + direction.y;
 
-            Vector2D crossOrigin = new Vector2D(endX, endY).subtract(direction.normalized().scale(crossLength));
+            double crossLength = direction.getLength() / 10.0;
+
+            Vector2D crossOrigin = new Vector2D(endX, endY)
+                    .subtract(direction.normalized().scale(crossLength));
+
             Vector2D normalScaled = normal.scale(crossLength);
+
             Vector2D arrowVec1 = crossOrigin.subtract(normalScaled);
             Vector2D arrowVec2 = crossOrigin.add(normalScaled);
 
-            g2.drawLine(
-                    toInt(center.x),
-                    toInt(center.y),
-                    toInt(crossOrigin.x),
-                    toInt(crossOrigin.y)
-            );
+            g2.draw(new Line2D.Double(
+                    center.x, center.y,
+                    crossOrigin.x, crossOrigin.y
+            ));
 
-            g2.fillPolygon(
-                    new int[]{endX, toInt(arrowVec1.x), toInt(arrowVec2.x)},
-                    new int[]{endY, toInt(arrowVec1.y), toInt(arrowVec2.y)},
-                    3
-            );
+            Path2D.Double arrow = new Path2D.Double();
+            arrow.moveTo(endX, endY);
+            arrow.lineTo(arrowVec1.x, arrowVec1.y);
+            arrow.lineTo(arrowVec2.x, arrowVec2.y);
+            arrow.closePath();
 
-
+            g2.fill(arrow);
         }
-    }
-
-    private int toInt(double val) {
-        return Math.toIntExact(Math.round(val));
     }
 
     private void configureControls() {
 
         MouseAdapter mouseAdapter = new MouseAdapter() {
-            private final Cursor defaultCursor =  new Cursor(Cursor.DEFAULT_CURSOR);
-            private final Cursor panningCursor =  new Cursor(Cursor.MOVE_CURSOR);
 
 
             @Override
             public void mousePressed(MouseEvent e) {
                 lastDragPoint = e.getPoint();
                 if (SwingUtilities.isLeftMouseButton(e)) {
-
+                    handleMouseClick(e);
                 }
             }
 
@@ -188,12 +234,7 @@ public class Sandbox extends JPanel {
             @Override
             public void mouseDragged(MouseEvent e) {
                 if (SwingUtilities.isRightMouseButton(e)) {
-                    setCursor(panningCursor);
-                    int dx = e.getX() - lastDragPoint.x;
-                    int dy = e.getY() - lastDragPoint.y;
-                    translateX += dx;
-                    translateY += dy;
-                    lastDragPoint = e.getPoint();
+                    handlePanning(e);
                 }
             }
         };
@@ -211,7 +252,7 @@ public class Sandbox extends JPanel {
             else
                 scale /= Math.pow(factor, notches);
 
-            scale = Math.clamp(scale, 0.005, 100.0);
+            scale = Math.clamp(scale, 0.005, 4.0); //TODO: bug: muren verdwijnen bij scale > 4
 
             Point p = e.getPoint();
             translateX = (int) (p.x - (p.x - translateX) * (scale / oldScale));
@@ -231,9 +272,59 @@ public class Sandbox extends JPanel {
         });
     }
 
+    private void handlePanning(MouseEvent e) {
+        setCursor(panningCursor);
+        int dx = e.getX() - lastDragPoint.x;
+        int dy = e.getY() - lastDragPoint.y;
+        translateX += dx;
+        translateY += dy;
+        lastDragPoint = e.getPoint();
+    }
+
+    private void handleMouseClick(MouseEvent e) {
+        Vector2D worldPoint = new Vector2D((e.getX() - translateX) / scale, -(e.getY() - translateY) / scale);
+
+        Optional<Body> body = world.findBody(worldPoint.x, worldPoint.y);
+        body.ifPresentOrElse(
+                (b) -> {
+                    showBodyDataPanel = true;
+                    selectedBody = b;
+
+                    if (bodyDataPanel != null) {
+                        this.remove(bodyDataPanel);
+                    }
+
+                    bodyDataPanel = new BodyDataPanel(b);
+
+                    bodyDataPanel.setSize(bodyDataPanel.getPreferredSize());
+
+                    int padding = 10;
+                    int x = this.getWidth() - bodyDataPanel.getWidth() - padding;
+                    int y = padding;
+
+                    bodyDataPanel.setLocation(x, y);
+
+                    this.add(bodyDataPanel, JLayeredPane.PALETTE_LAYER);
+                    this.revalidate();
+                    this.repaint();
+                },
+                () -> {
+                    showBodyDataPanel = false;
+                    selectedBody = null;
+
+                    if (bodyDataPanel != null) {
+                        this.remove(bodyDataPanel);
+                        bodyDataPanel = null;
+                        this.revalidate();
+                        this.repaint();
+                    }
+                }
+        );
+    }
+
     public void configure() {
         setBackground(Color.WHITE);
-        setLayout(new OverlayLayout(this));
+        setLayout(null);
         configureControls();
     }
 }

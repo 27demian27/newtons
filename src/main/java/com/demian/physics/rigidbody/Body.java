@@ -57,8 +57,11 @@ public abstract class Body {
 
         angular_v = angular_v + angular_a * dt;
 
-        velocity_vec.x = velocity_vec.x + accel_vec.x * dt;
-        velocity_vec.y = velocity_vec.y + accel_vec.y * dt;
+        velocity_vec = new Vector2D(
+                velocity_vec.x + accel_vec.x * dt,
+                velocity_vec.y + accel_vec.y * dt
+        );
+
 
         rotation = rotation + angular_v * dt;
 

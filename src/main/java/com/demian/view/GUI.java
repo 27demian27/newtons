@@ -40,6 +40,7 @@ public class GUI {
         Thread.ofPlatform().start(simulation);
 
     }
+
     public void startPainting() {
         Timer timer = new Timer(16, e -> {
             sandbox.repaint();
