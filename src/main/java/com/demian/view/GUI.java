@@ -1,6 +1,8 @@
 package com.demian.view;
 
 import com.demian.physics.World;
+import com.demian.physics.rigidbody.Body;
+import com.demian.physics.util.Vector2D;
 import com.demian.simulation.Simulation;
 
 import javax.swing.*;
@@ -44,6 +46,8 @@ public class GUI {
     public void startPainting() {
         Timer timer = new Timer(16, e -> {
             sandbox.repaint();
+            sandbox.incrementLastDragUpdate(0.016f);
+            sandbox.handleBodyHold();
         });
         timer.setCoalesce(false);
         timer.start();

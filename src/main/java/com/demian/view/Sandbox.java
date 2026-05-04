@@ -27,7 +27,6 @@ public class Sandbox extends JLayeredPane {
     private double translateX;
     private double translateY;
 
-    private Point lastDragPoint;
     private boolean initialized;
 
     private final Cursor defaultCursor =  new Cursor(Cursor.DEFAULT_CURSOR);
@@ -38,6 +37,9 @@ public class Sandbox extends JLayeredPane {
     private boolean showBodyDataPanel;
     private BodyDataPanel bodyDataPanel;
     private Body selectedBody;
+    private Point lastDragPoint;
+    private float lastDragUpdate;
+    private boolean mousePressed;
 
     public Sandbox(World world, Simulation simulation) {
         this.world = world;
@@ -49,6 +51,7 @@ public class Sandbox extends JLayeredPane {
         initialized = false;
         showBodyDataPanel = false;
         selectedBody = null;
+        lastDragUpdate = Float.POSITIVE_INFINITY;
     }
 
     public void initializeWorld() {
@@ -218,15 +221,20 @@ public class Sandbox extends JLayeredPane {
 
             @Override
             public void mousePressed(MouseEvent e) {
-                lastDragPoint = e.getPoint();
+                mousePressed = true;
                 if (SwingUtilities.isLeftMouseButton(e)) {
                     handleMouseClick(e);
                 }
+                if (SwingUtilities.isRightMouseButton(e)) {
+                    selectedBody = null;
+                }
+                lastDragPoint = e.getPoint();
             }
 
             @Override
             public void mouseReleased(MouseEvent e) {
                 lastDragPoint = null;
+                mousePressed = false;
                 setCursor(defaultCursor);
             }
 
@@ -236,6 +244,13 @@ public class Sandbox extends JLayeredPane {
                 if (SwingUtilities.isRightMouseButton(e)) {
                     handlePanning(e);
                 }
+                if (SwingUtilities.isLeftMouseButton(e)) {
+                    if (selectedBody != null && !selectedBody.isImmovable()) {
+                        handleBodyDrag(selectedBody, e);
+                    }
+                }
+                lastDragPoint = e.getPoint();
+                lastDragUpdate = 0.0f;
             }
         };
 
@@ -272,6 +287,32 @@ public class Sandbox extends JLayeredPane {
         });
     }
 
+    public void handleBodyHold() {
+        if (mousePressed) {
+            if (selectedBody != null && !selectedBody.isImmovable()) {
+                Body body = selectedBody;
+                if (body instanceof Rect rect) {
+                    rect.setX(toWorldPoint(lastDragPoint).x - rect.getWidth() / 2.0);
+                    rect.setY(toWorldPoint(lastDragPoint).y - rect.getHeight() / 2.0);
+                } else if (body instanceof Circle circle) {
+                    circle.setX(toWorldPoint(lastDragPoint).x - circle.radius);
+                    circle.setY(toWorldPoint(lastDragPoint).y - circle.radius);
+                }
+
+                if (lastDragUpdate > 0.1f) body.setVelocity_vec(new Vector2D(0, 0));
+            }
+        }
+    }
+
+    private void handleBodyDrag(Body body, MouseEvent e) {
+        System.out.println(lastDragUpdate);
+        Vector2D worldPoint = toWorldPoint(e.getPoint());
+        Vector2D worldLastDragPoint = toWorldPoint(lastDragPoint);
+        if (lastDragUpdate <= 0.1f && lastDragUpdate >= 0.016f) {
+            body.setVelocity_vec(new Vector2D(worldPoint.subtract(worldLastDragPoint)).scale(1/lastDragUpdate));
+        }
+    }
+
     private void handlePanning(MouseEvent e) {
         setCursor(panningCursor);
         int dx = e.getX() - lastDragPoint.x;
@@ -282,7 +323,7 @@ public class Sandbox extends JLayeredPane {
     }
 
     private void handleMouseClick(MouseEvent e) {
-        Vector2D worldPoint = new Vector2D((e.getX() - translateX) / scale, -(e.getY() - translateY) / scale);
+        Vector2D worldPoint = toWorldPoint(e.getPoint());
 
         Optional<Body> body = world.findBody(worldPoint.x, worldPoint.y);
         body.ifPresentOrElse(
@@ -322,9 +363,17 @@ public class Sandbox extends JLayeredPane {
         );
     }
 
+    public Vector2D toWorldPoint(Point viewPoint) {
+        return new Vector2D((viewPoint.getX() - translateX) / scale, -(viewPoint.getY() - translateY) / scale);
+    }
+
     public void configure() {
         setBackground(Color.WHITE);
         setLayout(null);
         configureControls();
+    }
+
+    public void incrementLastDragUpdate(float t) {
+        lastDragUpdate += t;
     }
 }
