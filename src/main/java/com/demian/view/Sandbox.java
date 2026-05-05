@@ -41,6 +41,9 @@ public class Sandbox extends JLayeredPane {
     private float lastDragUpdate;
     private boolean mousePressed;
 
+    private boolean inInsertionMode;
+    private Body insertionBody;
+
     public Sandbox(World world, Simulation simulation) {
         this.world = world;
         this.simulation = simulation;
@@ -223,7 +226,9 @@ public class Sandbox extends JLayeredPane {
             public void mousePressed(MouseEvent e) {
                 mousePressed = true;
                 if (SwingUtilities.isLeftMouseButton(e)) {
-                    handleMouseClick(e);
+                    Vector2D worldPoint = toWorldPoint(e.getPoint());
+                    Optional<Body> body = world.findBody(worldPoint.x, worldPoint.y);
+                    if (body.isEmpty() || body.get() != selectedBody) selectedBody = null;
                 }
                 if (SwingUtilities.isRightMouseButton(e)) {
                     selectedBody = null;
@@ -234,6 +239,9 @@ public class Sandbox extends JLayeredPane {
             @Override
             public void mouseReleased(MouseEvent e) {
                 lastDragPoint = null;
+                if (SwingUtilities.isLeftMouseButton(e)) {
+                    handleMouseClick(e);
+                }
                 mousePressed = false;
                 setCursor(defaultCursor);
             }
@@ -276,6 +284,7 @@ public class Sandbox extends JLayeredPane {
         });
 
         getInputMap(WHEN_IN_FOCUSED_WINDOW).put(KeyStroke.getKeyStroke("SPACE"), "pauseSim");
+        getInputMap(WHEN_IN_FOCUSED_WINDOW).put(KeyStroke.getKeyStroke("control I"), "insertionMode");
         getActionMap().put("pauseSim", new AbstractAction() {
             @Override
             public void actionPerformed(ActionEvent actionEvent) {
@@ -283,6 +292,13 @@ public class Sandbox extends JLayeredPane {
                     simulation.unpause();
                 else
                     simulation.pause();
+            }
+        });
+        getActionMap().put("insertionMode", new AbstractAction() {
+            @Override
+            public void actionPerformed(ActionEvent actionEvent) {
+                inInsertionMode = !inInsertionMode;
+                System.out.println("switching " + (inInsertionMode ? "to Insertion mode" : "to Normal mode"));
             }
         });
     }
@@ -314,6 +330,7 @@ public class Sandbox extends JLayeredPane {
     }
 
     private void handlePanning(MouseEvent e) {
+        if (lastDragPoint == null) return;
         setCursor(panningCursor);
         int dx = e.getX() - lastDragPoint.x;
         int dy = e.getY() - lastDragPoint.y;
@@ -324,43 +341,50 @@ public class Sandbox extends JLayeredPane {
 
     private void handleMouseClick(MouseEvent e) {
         Vector2D worldPoint = toWorldPoint(e.getPoint());
+        if (inInsertionMode) {
+            insertionBody = new Circle(10, 0, 0, 5);
+            insertionBody.setX(worldPoint.x);
+            insertionBody.setY(worldPoint.y);
+            world.addBody(insertionBody);
+        } else {
+            Optional<Body> body = world.findBody(worldPoint.x, worldPoint.y);
+            body.ifPresentOrElse(this::addBodyDataPanel, this::removeBodyDataPanel);
+        }
+    }
 
-        Optional<Body> body = world.findBody(worldPoint.x, worldPoint.y);
-        body.ifPresentOrElse(
-                (b) -> {
-                    showBodyDataPanel = true;
-                    selectedBody = b;
+    private void addBodyDataPanel(Body b) {
+        showBodyDataPanel = true;
+        selectedBody = b;
 
-                    if (bodyDataPanel != null) {
-                        this.remove(bodyDataPanel);
-                    }
+        if (bodyDataPanel != null) {
+            this.remove(bodyDataPanel);
+        }
 
-                    bodyDataPanel = new BodyDataPanel(b);
+        bodyDataPanel = new BodyDataPanel(b);
 
-                    bodyDataPanel.setSize(bodyDataPanel.getPreferredSize());
+        bodyDataPanel.setSize(bodyDataPanel.getPreferredSize());
 
-                    int padding = 10;
-                    int x = this.getWidth() - bodyDataPanel.getWidth() - padding;
-                    int y = padding;
+        int padding = 10;
+        int x = this.getWidth() - bodyDataPanel.getWidth() - padding;
+        int y = padding;
 
-                    bodyDataPanel.setLocation(x, y);
+        bodyDataPanel.setLocation(x, y);
 
-                    this.add(bodyDataPanel, JLayeredPane.PALETTE_LAYER);
-                    this.revalidate();
-                    this.repaint();
-                },
-                () -> {
-                    showBodyDataPanel = false;
-                    selectedBody = null;
+        this.add(bodyDataPanel, JLayeredPane.PALETTE_LAYER);
+        this.revalidate();
+        this.repaint();
+    }
 
-                    if (bodyDataPanel != null) {
-                        this.remove(bodyDataPanel);
-                        bodyDataPanel = null;
-                        this.revalidate();
-                        this.repaint();
-                    }
-                }
-        );
+    private void removeBodyDataPanel() {
+        showBodyDataPanel = false;
+        selectedBody = null;
+
+        if (bodyDataPanel != null) {
+            this.remove(bodyDataPanel);
+            bodyDataPanel = null;
+            this.revalidate();
+            this.repaint();
+        }
     }
 
     public Vector2D toWorldPoint(Point viewPoint) {

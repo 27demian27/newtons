@@ -1,5 +1,6 @@
 package com.demian.physics.util;
 
+import com.demian.physics.World;
 import com.demian.physics.rigidbody.Body;
 import com.demian.physics.rigidbody.shapes.Circle;
 import com.demian.physics.rigidbody.shapes.Rect;
@@ -8,8 +9,9 @@ public class Collisions {
 
     public static final double epsilon = 1.0;
     public static final double slop = 0.01;
-    public static final double baumgarte = 0.6;
+    public static final double baumgarte = 0.4;
 
+    public static final double energy_loss_percentage = 0.2;
 
     public static void correctPosition(Body body1, Body body2, CollisionData collisionData) {
 
@@ -123,11 +125,15 @@ public class Collisions {
         Vector2D impulse = normal.scale(j);
 
         body1.setVelocity_vec(
-                body1.getVelocity_vec().add(impulse.scale(1.0 / body1.mass))
+                body1.getVelocity_vec()
+                        .add(impulse.scale(1.0 / body1.mass))
+                        .scale(1 - energy_loss_percentage)
         );
 
         body2.setVelocity_vec(
-                body2.getVelocity_vec().subtract(impulse.scale(1.0 / body2.mass))
+                body2.getVelocity_vec()
+                        .subtract(impulse.scale(1.0 / body2.mass))
+                        .scale(1 - energy_loss_percentage)
         );
     }
 
