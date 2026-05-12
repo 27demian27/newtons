@@ -19,13 +19,23 @@ public class World {
     @Getter
     private List<Body> bodies;
 
+    @Getter
+    private List<Rope> ropes;
+
     public World() {
         bodies = new ArrayList<>();
+        ropes = new ArrayList<>();
     }
 
-    public void updateBodiesPosition(float dt) {
+    public void updateBodies(float dt) {
         for (Body body : bodies) {
             body.update(dt);
+        }
+    }
+
+    public void updateRopes(float dt) {
+        for (Rope rope : ropes) {
+            rope.update(dt);
         }
     }
 
@@ -79,8 +89,18 @@ public class World {
         bodies.add(body);
     }
 
+    public void addRope(Rope rope) {
+        rope.attachBodies(this);
+        ropes.add(rope);
+    }
+
     public void addBodies(Body body, Body... bodies) {
         this.bodies.add(body);
         this.bodies.addAll(List.of(bodies));
+    }
+
+    public void destroy() {
+        bodies.clear();
+        ropes.clear();
     }
 }

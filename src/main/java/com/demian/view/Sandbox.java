@@ -1,5 +1,6 @@
 package com.demian.view;
 
+import com.demian.physics.Rope;
 import com.demian.physics.rigidbody.Body;
 import com.demian.physics.World;
 import com.demian.physics.rigidbody.shapes.Circle;
@@ -74,7 +75,11 @@ public class Sandbox extends JLayeredPane {
         Circle c3 = new Circle(10, -50, 100, 10);
         Circle c4 = new Circle(10, -50, 50, 10);
         Rect r1 = new Rect(10, 300, 300, 100, 20);
-        world.addBodies(c3, c4, r1);
+        Rect r2 = new Rect(Double.POSITIVE_INFINITY, 200, 300, 5, 5);
+        Circle c5 = new Circle(10, 200, 200, 10);
+
+        world.addBodies(c3, c4, r1, r2, c5);
+        world.addRope(new Rope(r2.getCenterOfMass(), c5.getCenterOfMass()));
     }
 
     @Override
@@ -99,6 +104,7 @@ public class Sandbox extends JLayeredPane {
 
 
 
+        drawRopes(g2);
         drawShapes(g2);
         drawOverlay(g2);
         drawDirectionVecs(g2);
@@ -169,6 +175,20 @@ public class Sandbox extends JLayeredPane {
         }
     }
 
+    private void drawRopes(Graphics2D g2) {
+        g2.setStroke(bodyStroke);
+
+        for (Rope rope : world.getRopes()) {
+            g2.draw(new Line2D.Double(
+                        rope.getPos1().x,
+                        rope.getPos1().y,
+                        rope.getPos2().x,
+                        rope.getPos2().y
+                    )
+            );
+        }
+    }
+
     private void drawDirectionVecs(Graphics2D g2) {
         g2.setStroke(bodyStroke);
         g2.setColor(Color.BLACK);
@@ -180,19 +200,19 @@ public class Sandbox extends JLayeredPane {
             Vector2D center = body.getCenterOfMass();
             Vector2D velocity = body.getVelocity_vec();
 
-            if (velocity.getLength() == 0)
+            if (velocity.length() == 0)
                 continue;
 
             Vector2D direction = velocity
                     .normalized()
-                    .scale(Math.clamp(velocity.getLength(), 0, 20));
+                    .scale(Math.clamp(velocity.length(), 0, 20));
 
             Vector2D normal = direction.rotate(Math.PI / 2.0).normalized();
 
             double endX = center.x + direction.x;
             double endY = center.y + direction.y;
 
-            double crossLength = direction.getLength() / 10.0;
+            double crossLength = direction.length() / 10.0;
 
             Vector2D crossOrigin = new Vector2D(endX, endY)
                     .subtract(direction.normalized().scale(crossLength));
@@ -285,6 +305,7 @@ public class Sandbox extends JLayeredPane {
 
         getInputMap(WHEN_IN_FOCUSED_WINDOW).put(KeyStroke.getKeyStroke("SPACE"), "pauseSim");
         getInputMap(WHEN_IN_FOCUSED_WINDOW).put(KeyStroke.getKeyStroke("control I"), "insertionMode");
+        getInputMap(WHEN_IN_FOCUSED_WINDOW).put(KeyStroke.getKeyStroke("control shift R"), "resetWorld");
         getActionMap().put("pauseSim", new AbstractAction() {
             @Override
             public void actionPerformed(ActionEvent actionEvent) {
@@ -299,6 +320,13 @@ public class Sandbox extends JLayeredPane {
             public void actionPerformed(ActionEvent actionEvent) {
                 inInsertionMode = !inInsertionMode;
                 System.out.println("switching " + (inInsertionMode ? "to Insertion mode" : "to Normal mode"));
+            }
+        });
+        getActionMap().put("resetWorld", new AbstractAction() {
+            @Override
+            public void actionPerformed(ActionEvent actionEvent) {
+                world.destroy();
+                initializeWorld();
             }
         });
     }

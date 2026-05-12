@@ -13,25 +13,25 @@ class Vector2DTest {
     }
 
     @Test
-    public void testGetAngle() {
-        assertThat(new Vector2D(1, 0).getAngle(), is(0.0));
-        assertThat(new Vector2D(-1, 0).getAngle(), is(Math.PI));
-        assertThat(new Vector2D(0, 1).getAngle(), is(Math.PI / 2.0));
-        assertThat(new Vector2D(0, -1).getAngle(), is(-Math.PI / 2.0));
-        assertThat(new Vector2D(1, 1).getAngle(), is(Math.PI / 4.0));
-        assertThat(new Vector2D(1, 5).getAngle(), is(Math.atan(5)));
+    public void testAngle() {
+        assertThat(new Vector2D(1, 0).angle(), is(0.0));
+        assertThat(new Vector2D(-1, 0).angle(), is(Math.PI));
+        assertThat(new Vector2D(0, 1).angle(), is(Math.PI / 2.0));
+        assertThat(new Vector2D(0, -1).angle(), is(-Math.PI / 2.0));
+        assertThat(new Vector2D(1, 1).angle(), is(Math.PI / 4.0));
+        assertThat(new Vector2D(1, 5).angle(), is(Math.atan(5)));
 
     }
 
     @Test
-    public void testGetLength() {
-        assertThat(new Vector2D(1, 0).getLength(), is(1.0));
-        assertThat(new Vector2D(-1, 0).getLength(), is(1.0));
-        assertThat(new Vector2D(0, 1).getLength(), is(1.0));
-        assertThat(new Vector2D(0, -1).getLength(), is(1.0));
-        assertThat(new Vector2D(1, 1).getLength(), is(Math.sqrt(2)));
+    public void testLength() {
+        assertThat(new Vector2D(1, 0).length(), is(1.0));
+        assertThat(new Vector2D(-1, 0).length(), is(1.0));
+        assertThat(new Vector2D(0, 1).length(), is(1.0));
+        assertThat(new Vector2D(0, -1).length(), is(1.0));
+        assertThat(new Vector2D(1, 1).length(), is(Math.sqrt(2)));
 
-        assertThat(new Vector2D(58, 241).getLength(), is(Math.sqrt(Math.pow(58, 2) + Math.pow(241, 2))));
+        assertThat(new Vector2D(58, 241).length(), is(Math.sqrt(Math.pow(58, 2) + Math.pow(241, 2))));
     }
 
     @Test

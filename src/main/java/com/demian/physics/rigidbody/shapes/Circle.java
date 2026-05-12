@@ -15,7 +15,7 @@ public class Circle extends Body {
 
     @Override
     public boolean contains(double x, double y) {
-        return getCenterOfMass().subtract(new Vector2D(x, y)).getLength() < radius;
+        return getCenterOfMass().subtract(new Vector2D(x, y)).length() < radius;
     }
 
 

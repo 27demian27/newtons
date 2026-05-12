@@ -1,6 +1,5 @@
 package com.demian.physics.util;
 
-import com.demian.physics.World;
 import com.demian.physics.rigidbody.Body;
 import com.demian.physics.rigidbody.shapes.Circle;
 import com.demian.physics.rigidbody.shapes.Rect;
@@ -31,12 +30,12 @@ public class Collisions {
 
     public static CollisionData circleCircle(Circle c1, Circle c2) {
 
-        if (c1.getCenterOfMass().subtract(c2.getCenterOfMass()).getLength() >= c1.radius + c2.radius)
+        if (c1.getCenterOfMass().subtract(c2.getCenterOfMass()).length() >= c1.radius + c2.radius)
             return new CollisionData(false, new Vector2D(0, 0), 0);
 
         Vector2D diff = c1.getCenterOfMass().subtract(c2.getCenterOfMass());
         Vector2D normal = diff.normalized();
-        double penetration = c1.radius + c2.radius - diff.getLength();
+        double penetration = c1.radius + c2.radius - diff.length();
 
         return new CollisionData(true, normal, penetration);
 

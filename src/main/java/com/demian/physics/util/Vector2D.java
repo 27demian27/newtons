@@ -21,16 +21,16 @@ public class Vector2D {
         return vec1.x * vec2.x + vec1.y * vec2.y;
     }
 
-    public double getAngle() {
+    public double angle() {
         return Math.atan2(y, x);
     }
 
-    public double getLength() {
+    public double length() {
         return Math.sqrt(Math.pow(x, 2) + Math.pow(y, 2));
     }
 
     public Vector2D normalized() {
-        double magnitude = getLength();
+        double magnitude = length();
         return new Vector2D(x / magnitude, y / magnitude);
     }
 

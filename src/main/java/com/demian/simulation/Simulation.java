@@ -1,11 +1,12 @@
 package com.demian.simulation;
 
 import com.demian.physics.World;
-import com.demian.view.Sandbox;
 
 import java.util.concurrent.atomic.AtomicBoolean;
 
 public class Simulation implements Runnable{
+
+    private static final float TIME_STEP = 0.008f;
 
     private final World world;
 
@@ -21,12 +22,13 @@ public class Simulation implements Runnable{
 
         while (true) {
             try {
-                Thread.sleep(8);
+                Thread.sleep((long) (TIME_STEP * 1000));
             } catch (InterruptedException e) {
                 throw new RuntimeException(e);
             }
             if (isRunning.get()) {
-                world.updateBodiesPosition(0.008f);
+                world.updateBodies(TIME_STEP);
+                world.updateRopes(TIME_STEP);
                 world.checkCollisions();
             }
         }
