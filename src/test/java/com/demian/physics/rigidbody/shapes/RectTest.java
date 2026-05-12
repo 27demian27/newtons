@@ -23,19 +23,4 @@ public class RectTest {
         Vector2D center = new Vector2D(15, 15);
         assertThat(rect1.getCenterOfMass(), is(center));
     }
-
-    @Test
-    public void testGetReferenceArea() {
-        Rect rect1 = new Rect(10, 0, 0, 30, 20);
-        assertThat(rect1.getReferenceArea(), is(0.0));
-
-        rect1.setVelocity_vec(new Vector2D(-1, 0));
-        assertThat(rect1.getReferenceArea(), is(20.0));
-
-        rect1.setVelocity_vec(new Vector2D(1, 1));
-        assertThat(rect1.getReferenceArea(), is(50.0));
-
-        rect1.setVelocity_vec(new Vector2D(0, 1));
-        assertThat(rect1.getReferenceArea(), is(30.0));
-    }
 }

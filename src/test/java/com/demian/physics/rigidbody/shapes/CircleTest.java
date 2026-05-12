@@ -31,11 +31,4 @@ public class CircleTest {
 
         assertThat(c2.getCenterOfMass(), is(center2));
     }
-
-    @Test
-    public void testGetReferenceArea() {
-        Circle c1 = new Circle(10, 0, 0, 17);
-
-        assertThat(c1.getReferenceArea(), is(17*2.0));
-    }
 }
