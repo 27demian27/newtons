@@ -7,55 +7,56 @@ import com.demian.physics.rigidbody.shapes.Circle;
 import com.demian.physics.rigidbody.shapes.Rect;
 import com.demian.physics.util.Vector2D;
 import com.demian.simulation.Simulation;
+import lombok.Getter;
+import lombok.Setter;
 
 import javax.swing.*;
 import java.awt.*;
-import java.awt.event.ActionEvent;
-import java.awt.event.MouseAdapter;
-import java.awt.event.MouseEvent;
 import java.awt.geom.Ellipse2D;
 import java.awt.geom.Line2D;
 import java.awt.geom.Path2D;
 import java.awt.geom.Rectangle2D;
-import java.util.Optional;
 
+@Getter
 public class Sandbox extends JLayeredPane {
 
     private final World world;
-    private final Simulation simulation;
+    final Simulation simulation;
 
+    @Setter
     private double scale;
     private double translateX;
     private double translateY;
 
     private boolean initialized;
 
-    private final Cursor defaultCursor =  new Cursor(Cursor.DEFAULT_CURSOR);
-    private final Cursor panningCursor =  new Cursor(Cursor.MOVE_CURSOR);
-    private final Stroke axisLinesStroke = new BasicStroke(0.20f, BasicStroke.CAP_BUTT, BasicStroke.JOIN_MITER, 10.0f, new float[]{1.0f}, 0.0f);
-    private final Stroke bodyStroke = new BasicStroke(0.50f);
+    public final Cursor defaultCursor =  new Cursor(Cursor.DEFAULT_CURSOR);
+    public final Cursor panningCursor =  new Cursor(Cursor.MOVE_CURSOR);
+    public final Stroke axisLinesStroke = new BasicStroke(0.20f, BasicStroke.CAP_BUTT, BasicStroke.JOIN_MITER, 10.0f, new float[]{1.0f}, 0.0f);
+    public final Stroke bodyStroke = new BasicStroke(0.50f);
+
+    @Setter
+    private Body selectedBody;
 
     private boolean showBodyDataPanel;
     private BodyDataPanel bodyDataPanel;
-    private Body selectedBody;
-    private Point lastDragPoint;
-    private float lastDragUpdate;
-    private boolean mousePressed;
 
+    @Setter
     private boolean inInsertionMode;
+    @Setter
     private Body insertionBody;
 
     public Sandbox(World world, Simulation simulation) {
         this.world = world;
         this.simulation = simulation;
-
         scale = 1.0;
         translateX = 0.0;
         translateY = 0.0;
         initialized = false;
         showBodyDataPanel = false;
         selectedBody = null;
-        lastDragUpdate = Float.POSITIVE_INFINITY;
+        setBackground(Color.WHITE);
+        setLayout(null);
     }
 
     public void initializeWorld() {
@@ -237,150 +238,7 @@ public class Sandbox extends JLayeredPane {
         }
     }
 
-    private void configureControls() {
-
-        MouseAdapter mouseAdapter = new MouseAdapter() {
-
-
-            @Override
-            public void mousePressed(MouseEvent e) {
-                mousePressed = true;
-                if (SwingUtilities.isLeftMouseButton(e)) {
-                    Vector2D worldPoint = toWorldPoint(e.getPoint());
-                    Optional<Body> body = world.findBody(worldPoint.x, worldPoint.y);
-                    if (body.isEmpty() || body.get() != selectedBody) selectedBody = null;
-                }
-                if (SwingUtilities.isRightMouseButton(e)) {
-                    selectedBody = null;
-                }
-                lastDragPoint = e.getPoint();
-            }
-
-            @Override
-            public void mouseReleased(MouseEvent e) {
-                lastDragPoint = null;
-                if (SwingUtilities.isLeftMouseButton(e)) {
-                    handleMouseClick(e);
-                }
-                mousePressed = false;
-                setCursor(defaultCursor);
-            }
-
-
-            @Override
-            public void mouseDragged(MouseEvent e) {
-                if (SwingUtilities.isRightMouseButton(e)) {
-                    handlePanning(e);
-                }
-                if (SwingUtilities.isLeftMouseButton(e)) {
-                    if (selectedBody != null && !selectedBody.isImmovable()) {
-                        handleBodyDrag(selectedBody, e);
-                    }
-                }
-                lastDragPoint = e.getPoint();
-                lastDragUpdate = 0.0f;
-            }
-        };
-
-        addMouseListener(mouseAdapter);
-        addMouseMotionListener(mouseAdapter);
-
-
-        addMouseWheelListener(e -> {
-            double oldScale = scale;
-            double factor = 1.1;
-            int notches = e.getWheelRotation();
-            if (notches < 0)
-                scale *= Math.pow(factor, -notches);
-            else
-                scale /= Math.pow(factor, notches);
-
-            scale = Math.clamp(scale, 0.005, 4.0); //TODO: bug: muren verdwijnen bij scale > 4
-
-            Point p = e.getPoint();
-            translateX = (int) (p.x - (p.x - translateX) * (scale / oldScale));
-            translateY = (int) (p.y - (p.y - translateY) * (scale / oldScale));
-
-        });
-
-        getInputMap(WHEN_IN_FOCUSED_WINDOW).put(KeyStroke.getKeyStroke("SPACE"), "pauseSim");
-        getInputMap(WHEN_IN_FOCUSED_WINDOW).put(KeyStroke.getKeyStroke("control I"), "insertionMode");
-        getInputMap(WHEN_IN_FOCUSED_WINDOW).put(KeyStroke.getKeyStroke("control shift R"), "resetWorld");
-        getActionMap().put("pauseSim", new AbstractAction() {
-            @Override
-            public void actionPerformed(ActionEvent actionEvent) {
-                if (simulation.isPaused())
-                    simulation.unpause();
-                else
-                    simulation.pause();
-            }
-        });
-        getActionMap().put("insertionMode", new AbstractAction() {
-            @Override
-            public void actionPerformed(ActionEvent actionEvent) {
-                inInsertionMode = !inInsertionMode;
-                System.out.println("switching " + (inInsertionMode ? "to Insertion mode" : "to Normal mode"));
-            }
-        });
-        getActionMap().put("resetWorld", new AbstractAction() {
-            @Override
-            public void actionPerformed(ActionEvent actionEvent) {
-                world.destroy();
-                initializeWorld();
-            }
-        });
-    }
-
-    public void handleBodyHold() {
-        if (mousePressed) {
-            if (selectedBody != null && !selectedBody.isImmovable()) {
-                Body body = selectedBody;
-                if (body instanceof Rect rect) {
-                    rect.setX(toWorldPoint(lastDragPoint).x - rect.getWidth() / 2.0);
-                    rect.setY(toWorldPoint(lastDragPoint).y - rect.getHeight() / 2.0);
-                } else if (body instanceof Circle circle) {
-                    circle.setX(toWorldPoint(lastDragPoint).x - circle.radius);
-                    circle.setY(toWorldPoint(lastDragPoint).y - circle.radius);
-                }
-
-                if (lastDragUpdate > 0.1f) body.setVelocity_vec(new Vector2D(0, 0));
-            }
-        }
-    }
-
-    private void handleBodyDrag(Body body, MouseEvent e) {
-        System.out.println(lastDragUpdate);
-        Vector2D worldPoint = toWorldPoint(e.getPoint());
-        Vector2D worldLastDragPoint = toWorldPoint(lastDragPoint);
-        if (lastDragUpdate <= 0.1f && lastDragUpdate >= 0.016f) {
-            body.setVelocity_vec(new Vector2D(worldPoint.subtract(worldLastDragPoint)).scale(1/lastDragUpdate));
-        }
-    }
-
-    private void handlePanning(MouseEvent e) {
-        if (lastDragPoint == null) return;
-        setCursor(panningCursor);
-        int dx = e.getX() - lastDragPoint.x;
-        int dy = e.getY() - lastDragPoint.y;
-        translateX += dx;
-        translateY += dy;
-        lastDragPoint = e.getPoint();
-    }
-
-    private void handleMouseClick(MouseEvent e) {
-        Vector2D worldPoint = toWorldPoint(e.getPoint());
-        if (inInsertionMode) {
-            insertionBody = new Circle(10, 0, 0, 5);
-            insertionBody.setX(worldPoint.x);
-            insertionBody.setY(worldPoint.y);
-            world.addBody(insertionBody);
-        } else {
-            Optional<Body> body = world.findBody(worldPoint.x, worldPoint.y);
-            body.ifPresentOrElse(this::addBodyDataPanel, this::removeBodyDataPanel);
-        }
-    }
-
-    private void addBodyDataPanel(Body b) {
+    public void addBodyDataPanel(Body b) {
         showBodyDataPanel = true;
         selectedBody = b;
 
@@ -403,7 +261,7 @@ public class Sandbox extends JLayeredPane {
         this.repaint();
     }
 
-    private void removeBodyDataPanel() {
+    public void removeBodyDataPanel() {
         showBodyDataPanel = false;
         selectedBody = null;
 
@@ -415,17 +273,17 @@ public class Sandbox extends JLayeredPane {
         }
     }
 
+    public void setTranslation(double translateX, double translateY) {
+        this.translateX = translateX;
+        this.translateY = translateY;
+    }
+
+    public void translate(double x, double y) {
+        translateX += x;
+        translateY += y;
+    }
+
     public Vector2D toWorldPoint(Point viewPoint) {
         return new Vector2D((viewPoint.getX() - translateX) / scale, -(viewPoint.getY() - translateY) / scale);
-    }
-
-    public void configure() {
-        setBackground(Color.WHITE);
-        setLayout(null);
-        configureControls();
-    }
-
-    public void incrementLastDragUpdate(float t) {
-        lastDragUpdate += t;
     }
 }
