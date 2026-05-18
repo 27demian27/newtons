@@ -4,7 +4,9 @@ import com.demian.physics.rigidbody.Body;
 import com.demian.physics.util.Vector2D;
 import lombok.Getter;
 
-public class Rope {
+import java.io.Serializable;
+
+public class Rope implements Serializable {
 
     @Getter
     private Vector2D pos1;
@@ -23,7 +25,7 @@ public class Rope {
         this.pos1 = pos1;
         this.pos2 = pos2;
 
-        stiffness = 4.0;
+        stiffness = 6.0;
         base_length = pos1.subtract(pos2).length();
         stretch = 0.0;
     }

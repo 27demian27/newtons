@@ -5,8 +5,10 @@ import com.demian.physics.util.Vector2D;
 import lombok.Getter;
 import lombok.Setter;
 
+import java.io.Serializable;
+
 @Getter
-public abstract class Body {
+public abstract class Body implements Serializable {
 
     protected boolean immovable;
 

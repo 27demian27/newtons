@@ -1,9 +1,11 @@
 package com.demian.physics.util;
 
+import java.io.Serializable;
+
 /**
  * Class representing a vector on a 2D plane.
  */
-public class Vector2D {
+public class Vector2D implements Serializable {
     public final double x;
     public final double y;
 

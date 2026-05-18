@@ -1,10 +1,13 @@
 package com.demian.view.controls;
 
+import com.demian.io.WorldLoader;
+import com.demian.io.WorldWriter;
 import com.demian.physics.World;
 import com.demian.view.Sandbox;
 
 import javax.swing.*;
 import java.awt.event.ActionEvent;
+import java.io.IOException;
 
 import static javax.swing.JComponent.WHEN_IN_FOCUSED_WINDOW;
 
@@ -22,6 +25,10 @@ public class KeyControls {
         sandbox.getInputMap(WHEN_IN_FOCUSED_WINDOW).put(KeyStroke.getKeyStroke("SPACE"), "pauseSim");
         sandbox.getInputMap(WHEN_IN_FOCUSED_WINDOW).put(KeyStroke.getKeyStroke("control I"), "insertionMode");
         sandbox.getInputMap(WHEN_IN_FOCUSED_WINDOW).put(KeyStroke.getKeyStroke("control shift R"), "resetWorld");
+        sandbox.getInputMap(WHEN_IN_FOCUSED_WINDOW).put(KeyStroke.getKeyStroke("control S"), "saveWorld");
+        sandbox.getInputMap(WHEN_IN_FOCUSED_WINDOW).put(KeyStroke.getKeyStroke("control O"), "loadWorld");
+
+
         sandbox.getActionMap().put("pauseSim", new AbstractAction() {
             @Override
             public void actionPerformed(ActionEvent actionEvent) {
@@ -43,6 +50,28 @@ public class KeyControls {
             public void actionPerformed(ActionEvent actionEvent) {
                 world.destroy();
                 sandbox.initializeWorld();
+            }
+        });
+        sandbox.getActionMap().put("saveWorld", new AbstractAction() {
+            @Override
+            public void actionPerformed(ActionEvent actionEvent) {
+                try {
+                    WorldWriter.write(world);
+                } catch (IOException e) {
+                    throw new RuntimeException(e);
+                }
+            }
+        });
+        sandbox.getActionMap().put("loadWorld", new AbstractAction() {
+            @Override
+            public void actionPerformed(ActionEvent actionEvent) {
+                try {
+                    World loadedWorld = WorldLoader.load();
+                    world.setBodies(loadedWorld.getBodies());
+                    world.setRopes(loadedWorld.getRopes());
+                } catch (IOException e) {
+                    throw new RuntimeException(e);
+                }
             }
         });
     }

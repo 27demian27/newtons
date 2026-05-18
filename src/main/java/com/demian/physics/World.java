@@ -6,6 +6,7 @@ import com.demian.physics.rigidbody.shapes.Rect;
 import com.demian.physics.util.CollisionData;
 import com.demian.physics.util.Collisions;
 import lombok.Getter;
+import lombok.Setter;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -16,10 +17,10 @@ public class World {
     public final static double GRAVITY_CONSTANT = -9.81;
     public final static double AIR_DENSITY = 1.225;
 
-    @Getter
+    @Getter @Setter
     private List<Body> bodies;
 
-    @Getter
+    @Getter @Setter
     private List<Rope> ropes;
 
     public World() {
