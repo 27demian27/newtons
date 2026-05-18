@@ -86,6 +86,15 @@ public class World {
         return Optional.empty();
     }
 
+    public List<Rope> findRopesAttachedToBody(Body body) {
+        List<Rope> attachedRopes = new ArrayList<>();
+        for (Rope rope : ropes) {
+            if (rope.getAttachedBody1() == body || rope.getAttachedBody2() == body)
+                attachedRopes.add(rope);
+        }
+        return attachedRopes;
+    }
+
     public void addBody(Body body) {
         bodies.add(body);
     }

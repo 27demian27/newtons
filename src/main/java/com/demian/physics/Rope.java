@@ -6,11 +6,10 @@ import lombok.Getter;
 
 import java.io.Serializable;
 
+@Getter
 public class Rope implements Serializable {
 
-    @Getter
     private Vector2D pos1;
-    @Getter
     private Vector2D pos2;
 
     private Body attachedBody1;
@@ -35,6 +34,7 @@ public class Rope implements Serializable {
         world.findBody(pos2.x, pos2.y).ifPresent(b -> attachedBody2 = b);
     }
 
+
     public void update(float dt) {
 
         pos1 = attachedBody1.getCenterOfMass();
@@ -45,18 +45,17 @@ public class Rope implements Serializable {
         Vector2D accelDirection1 = pos2.subtract(pos1).normalized();
         Vector2D accelDirection2 = pos1.subtract(pos2).normalized();
 
-        attachedBody1.setAccel_vec(
-                accelDirection1
-                        .scale(stretch * stiffness / attachedBody1.mass)
-                        .add(new Vector2D(0, World.GRAVITY_CONSTANT))
+        attachedBody1.setNext_accel_vec(
+                attachedBody1.getNext_accel_vec().add(
+                        accelDirection1.scale(stretch * stiffness / attachedBody1.mass)
+                )
         );
 
-        attachedBody2.setAccel_vec(
-                accelDirection2
-                        .scale(stretch * stiffness / attachedBody2.mass)
-                        .add(new Vector2D(0, World.GRAVITY_CONSTANT))
+        attachedBody2.setNext_accel_vec(
+                attachedBody2.getNext_accel_vec().add(
+                        accelDirection2.scale(stretch * stiffness / attachedBody2.mass)
+                )
         );
-        System.out.println("Stretch of rope: " + stretch);
     }
 
 }

@@ -1,5 +1,6 @@
-package com.demian.view;
+package com.demian.view.data;
 
+import com.demian.physics.Rope;
 import com.demian.physics.rigidbody.Body;
 import com.demian.physics.rigidbody.shapes.Circle;
 import com.demian.physics.rigidbody.shapes.Rect;
@@ -7,10 +8,14 @@ import com.demian.physics.rigidbody.shapes.Rect;
 import javax.swing.*;
 import java.awt.*;
 import java.text.DecimalFormat;
+import java.util.ArrayList;
+import java.util.List;
 
 public class BodyDataPanel extends JPanel {
 
     private final Body body;
+
+    private final List<RopeDataPanel> ropeDataPanels = new ArrayList<>();
 
     private final JLabel nameLabel = new JLabel();
     private final JLabel massLabel = new JLabel();
@@ -23,7 +28,7 @@ public class BodyDataPanel extends JPanel {
 
     private final DecimalFormat df = new DecimalFormat("#.00");
 
-    public BodyDataPanel(Body body) {
+    public BodyDataPanel(Body body, List<Rope> ropes) {
         this.body = body;
 
         setLayout(new BoxLayout(this, BoxLayout.PAGE_AXIS));
@@ -38,8 +43,13 @@ public class BodyDataPanel extends JPanel {
         add(vyLabel);
         add(axLabel);
         add(ayLabel);
-
         add(positionLabel);
+
+        for (Rope rope : ropes) {
+            RopeDataPanel ropeDataPanel = new RopeDataPanel(rope);
+            add(ropeDataPanel);
+            ropeDataPanels.add(ropeDataPanel);
+        }
 
         update();
     }
@@ -52,6 +62,9 @@ public class BodyDataPanel extends JPanel {
         positionLabel.setText("position: [" + df.format(body.getX()) + ", " + df.format(body.getY()) + "]");
         axLabel.setText("acceleration x: " + df.format((body.getAccel_vec().x)));
         ayLabel.setText("acceleration y: " + df.format((body.getAccel_vec().y)));
+
+        for (RopeDataPanel ropeDataPanel : ropeDataPanels)
+            ropeDataPanel.update();
     }
 
     private String getBodyName() {

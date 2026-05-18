@@ -25,6 +25,9 @@ public abstract class Body implements Serializable {
     @Setter
     protected Vector2D accel_vec;
 
+    @Setter
+    private Vector2D next_accel_vec;
+
     @Setter protected double x;
     @Setter protected double y;
 
@@ -36,6 +39,7 @@ public abstract class Body implements Serializable {
         this.y = y;
         velocity_vec = new Vector2D(0, 0);
         accel_vec = new Vector2D(0, World.GRAVITY_CONSTANT);
+        next_accel_vec = accel_vec;
         rotation = 0.0;
         angular_v = 0.0;
         angular_a = 0.0;
@@ -50,6 +54,7 @@ public abstract class Body implements Serializable {
     public void update(float dt) {
         if (immovable) return;
 
+        accel_vec = next_accel_vec;
 
         angular_v = angular_v + angular_a * dt;
 
@@ -65,6 +70,7 @@ public abstract class Body implements Serializable {
         x = x + velocity_vec.x * dt;
         y = y + velocity_vec.y * dt;
 
+        next_accel_vec = new Vector2D(0, World.GRAVITY_CONSTANT);
     }
 
     /**

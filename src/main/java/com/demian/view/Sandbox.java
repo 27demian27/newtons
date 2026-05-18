@@ -7,6 +7,7 @@ import com.demian.physics.rigidbody.shapes.Circle;
 import com.demian.physics.rigidbody.shapes.Rect;
 import com.demian.physics.util.Vector2D;
 import com.demian.simulation.Simulation;
+import com.demian.view.data.BodyDataPanel;
 import lombok.Getter;
 import lombok.Setter;
 
@@ -81,6 +82,7 @@ public class Sandbox extends JLayeredPane {
 
         world.addBodies(c3, c4, r1, r2, c5);
         world.addRope(new Rope(r2.getCenterOfMass(), c5.getCenterOfMass()));
+        world.addRope(new Rope(r1.getCenterOfMass(), c5.getCenterOfMass()));
     }
 
     @Override
@@ -246,7 +248,7 @@ public class Sandbox extends JLayeredPane {
             this.remove(bodyDataPanel);
         }
 
-        bodyDataPanel = new BodyDataPanel(b);
+        bodyDataPanel = new BodyDataPanel(b, world.findRopesAttachedToBody(b));
 
         bodyDataPanel.setSize(bodyDataPanel.getPreferredSize());
 
