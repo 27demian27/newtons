@@ -13,10 +13,7 @@ import lombok.Setter;
 
 import javax.swing.*;
 import java.awt.*;
-import java.awt.geom.Ellipse2D;
-import java.awt.geom.Line2D;
-import java.awt.geom.Path2D;
-import java.awt.geom.Rectangle2D;
+import java.awt.geom.*;
 
 @Getter
 public class Sandbox extends JLayeredPane {
@@ -182,13 +179,25 @@ public class Sandbox extends JLayeredPane {
         g2.setStroke(bodyStroke);
 
         for (Rope rope : world.getRopes()) {
-            g2.draw(new Line2D.Double(
+            if (rope.getStretch() > 0.0) {
+                g2.draw(new Line2D.Double(
+                                rope.getPos1().x,
+                                rope.getPos1().y,
+                                rope.getPos2().x,
+                                rope.getPos2().y
+                        )
+                );
+            } else {
+                double compress = rope.getPos1().subtract(rope.getPos2()).length() - rope.getBase_length();
+                g2.draw(new QuadCurve2D.Double(
                         rope.getPos1().x,
                         rope.getPos1().y,
+                        (rope.getPos2().x + rope.getPos1().x) / 2.0 + compress,
+                        (rope.getPos2().y + rope.getPos1().y) / 2.0 + compress,
                         rope.getPos2().x,
                         rope.getPos2().y
-                    )
-            );
+                ));
+            }
         }
     }
 
