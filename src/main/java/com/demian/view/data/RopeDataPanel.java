@@ -1,6 +1,6 @@
-package com.demian.view.data;
+package nl.demiannieuwenhuis.view.data;
 
-import com.demian.physics.Rope;
+import nl.demiannieuwenhuis.physics.Rope;
 
 import javax.swing.*;
 import java.awt.*;

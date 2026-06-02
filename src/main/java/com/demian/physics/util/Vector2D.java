@@ -1,4 +1,4 @@
-package com.demian.physics.util;
+package nl.demiannieuwenhuis.physics.util;
 
 import java.io.Serializable;
 

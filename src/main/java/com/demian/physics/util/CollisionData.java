@@ -1,4 +1,4 @@
-package com.demian.physics.util;
+package nl.demiannieuwenhuis.physics.util;
 
 public class CollisionData {
     public boolean colliding;

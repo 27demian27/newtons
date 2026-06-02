@@ -1,7 +1,7 @@
-package com.demian.physics.rigidbody.shapes;
+package nl.demiannieuwenhuis.physics.rigidbody.shapes;
 
-import com.demian.physics.rigidbody.Body;
-import com.demian.physics.util.Vector2D;
+import nl.demiannieuwenhuis.physics.rigidbody.Body;
+import nl.demiannieuwenhuis.physics.util.Vector2D;
 
 public class Circle extends Body {
 

@@ -1,10 +1,10 @@
-package com.demian.physics;
+package nl.demiannieuwenhuis.physics;
 
-import com.demian.physics.rigidbody.Body;
-import com.demian.physics.rigidbody.shapes.Circle;
-import com.demian.physics.rigidbody.shapes.Rect;
-import com.demian.physics.util.CollisionData;
-import com.demian.physics.util.Collisions;
+import nl.demiannieuwenhuis.physics.rigidbody.Body;
+import nl.demiannieuwenhuis.physics.rigidbody.shapes.Circle;
+import nl.demiannieuwenhuis.physics.rigidbody.shapes.Rect;
+import nl.demiannieuwenhuis.physics.util.CollisionData;
+import nl.demiannieuwenhuis.physics.util.Collisions;
 import lombok.Getter;
 import lombok.Setter;
 

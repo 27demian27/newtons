@@ -1,9 +1,9 @@
-package com.demian.view.controls;
+package nl.demiannieuwenhuis.view.controls;
 
-import com.demian.io.WorldLoader;
-import com.demian.io.WorldWriter;
-import com.demian.physics.World;
-import com.demian.view.Sandbox;
+import nl.demiannieuwenhuis.io.WorldLoader;
+import nl.demiannieuwenhuis.io.WorldWriter;
+import nl.demiannieuwenhuis.physics.World;
+import nl.demiannieuwenhuis.view.Sandbox;
 
 import javax.swing.*;
 import java.awt.event.ActionEvent;

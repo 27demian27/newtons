@@ -1,13 +1,13 @@
-package com.demian.view;
+package nl.demiannieuwenhuis.view;
 
-import com.demian.physics.Rope;
-import com.demian.physics.rigidbody.Body;
-import com.demian.physics.World;
-import com.demian.physics.rigidbody.shapes.Circle;
-import com.demian.physics.rigidbody.shapes.Rect;
-import com.demian.physics.util.Vector2D;
-import com.demian.simulation.Simulation;
-import com.demian.view.data.BodyDataPanel;
+import nl.demiannieuwenhuis.physics.Rope;
+import nl.demiannieuwenhuis.physics.rigidbody.Body;
+import nl.demiannieuwenhuis.physics.World;
+import nl.demiannieuwenhuis.physics.rigidbody.shapes.Circle;
+import nl.demiannieuwenhuis.physics.rigidbody.shapes.Rect;
+import nl.demiannieuwenhuis.physics.util.Vector2D;
+import nl.demiannieuwenhuis.simulation.Simulation;
+import nl.demiannieuwenhuis.view.data.BodyDataPanel;
 import lombok.Getter;
 import lombok.Setter;
 

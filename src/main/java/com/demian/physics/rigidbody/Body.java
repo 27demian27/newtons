@@ -1,7 +1,7 @@
-package com.demian.physics.rigidbody;
+package nl.demiannieuwenhuis.physics.rigidbody;
 
-import com.demian.physics.World;
-import com.demian.physics.util.Vector2D;
+import nl.demiannieuwenhuis.physics.World;
+import nl.demiannieuwenhuis.physics.util.Vector2D;
 import lombok.Getter;
 import lombok.Setter;
 

@@ -1,7 +1,7 @@
-package com.demian.physics;
+package nl.demiannieuwenhuis.physics;
 
-import com.demian.physics.rigidbody.Body;
-import com.demian.physics.util.Vector2D;
+import nl.demiannieuwenhuis.physics.rigidbody.Body;
+import nl.demiannieuwenhuis.physics.util.Vector2D;
 import lombok.Getter;
 
 import java.io.Serializable;

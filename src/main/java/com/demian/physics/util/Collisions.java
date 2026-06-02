@@ -1,8 +1,8 @@
-package com.demian.physics.util;
+package nl.demiannieuwenhuis.physics.util;
 
-import com.demian.physics.rigidbody.Body;
-import com.demian.physics.rigidbody.shapes.Circle;
-import com.demian.physics.rigidbody.shapes.Rect;
+import nl.demiannieuwenhuis.physics.rigidbody.Body;
+import nl.demiannieuwenhuis.physics.rigidbody.shapes.Circle;
+import nl.demiannieuwenhuis.physics.rigidbody.shapes.Rect;
 
 public class Collisions {
 

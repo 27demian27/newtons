@@ -1,11 +1,11 @@
-package com.demian.view.controls;
+package nl.demiannieuwenhuis.view.controls;
 
-import com.demian.physics.World;
-import com.demian.physics.rigidbody.Body;
-import com.demian.physics.rigidbody.shapes.Circle;
-import com.demian.physics.rigidbody.shapes.Rect;
-import com.demian.physics.util.Vector2D;
-import com.demian.view.Sandbox;
+import nl.demiannieuwenhuis.physics.World;
+import nl.demiannieuwenhuis.physics.rigidbody.Body;
+import nl.demiannieuwenhuis.physics.rigidbody.shapes.Circle;
+import nl.demiannieuwenhuis.physics.rigidbody.shapes.Rect;
+import nl.demiannieuwenhuis.physics.util.Vector2D;
+import nl.demiannieuwenhuis.view.Sandbox;
 
 import javax.swing.*;
 import java.awt.*;

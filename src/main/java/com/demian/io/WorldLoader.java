@@ -1,8 +1,8 @@
-package com.demian.io;
+package nl.demiannieuwenhuis.io;
 
-import com.demian.physics.Rope;
-import com.demian.physics.World;
-import com.demian.physics.rigidbody.Body;
+import nl.demiannieuwenhuis.physics.Rope;
+import nl.demiannieuwenhuis.physics.World;
+import nl.demiannieuwenhuis.physics.rigidbody.Body;
 
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;

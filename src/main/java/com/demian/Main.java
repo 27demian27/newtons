@@ -1,7 +1,7 @@
-package com.demian;
+package nl.demiannieuwenhuis;
 
-import com.demian.physics.World;
-import com.demian.view.GUI;
+import nl.demiannieuwenhuis.physics.World;
+import nl.demiannieuwenhuis.view.GUI;
 
 import javax.swing.*;
 

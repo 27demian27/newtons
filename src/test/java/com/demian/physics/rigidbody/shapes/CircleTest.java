@@ -1,6 +1,6 @@
-package com.demian.physics.rigidbody.shapes;
+package nl.demiannieuwenhuis.physics.rigidbody.shapes;
 
-import com.demian.physics.util.Vector2D;
+import nl.demiannieuwenhuis.physics.util.Vector2D;
 import org.junit.jupiter.api.Test;
 import static org.hamcrest.MatcherAssert.*;
 import static org.hamcrest.Matchers.*;

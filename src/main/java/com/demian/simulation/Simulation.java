@@ -1,6 +1,6 @@
-package com.demian.simulation;
+package nl.demiannieuwenhuis.simulation;
 
-import com.demian.physics.World;
+import nl.demiannieuwenhuis.physics.World;
 
 import java.util.concurrent.atomic.AtomicBoolean;
 

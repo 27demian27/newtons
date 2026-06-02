@@ -1,9 +1,9 @@
-package com.demian.view;
+package nl.demiannieuwenhuis.view;
 
-import com.demian.physics.World;
-import com.demian.simulation.Simulation;
-import com.demian.view.controls.KeyControls;
-import com.demian.view.controls.MouseControls;
+import nl.demiannieuwenhuis.physics.World;
+import nl.demiannieuwenhuis.simulation.Simulation;
+import nl.demiannieuwenhuis.view.controls.KeyControls;
+import nl.demiannieuwenhuis.view.controls.MouseControls;
 
 import javax.swing.*;
 import java.awt.*;

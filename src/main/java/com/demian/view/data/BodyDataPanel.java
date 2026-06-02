@@ -1,9 +1,9 @@
-package com.demian.view.data;
+package nl.demiannieuwenhuis.view.data;
 
-import com.demian.physics.Rope;
-import com.demian.physics.rigidbody.Body;
-import com.demian.physics.rigidbody.shapes.Circle;
-import com.demian.physics.rigidbody.shapes.Rect;
+import nl.demiannieuwenhuis.physics.Rope;
+import nl.demiannieuwenhuis.physics.rigidbody.Body;
+import nl.demiannieuwenhuis.physics.rigidbody.shapes.Circle;
+import nl.demiannieuwenhuis.physics.rigidbody.shapes.Rect;
 
 import javax.swing.*;
 import java.awt.*;
