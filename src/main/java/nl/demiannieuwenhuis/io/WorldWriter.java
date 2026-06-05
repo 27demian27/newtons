@@ -1,7 +1,6 @@
 package nl.demiannieuwenhuis.io;
 
 import nl.demiannieuwenhuis.physics.World;
-import nl.demiannieuwenhuis.physics.rigidbody.Body;
 
 import java.io.FileOutputStream;
 import java.io.IOException;

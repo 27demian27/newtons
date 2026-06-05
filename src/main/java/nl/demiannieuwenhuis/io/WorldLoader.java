@@ -5,11 +5,9 @@ import nl.demiannieuwenhuis.physics.World;
 import nl.demiannieuwenhuis.physics.rigidbody.Body;
 
 import java.io.FileInputStream;
-import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.nio.file.Path;
-import java.util.ArrayList;
 import java.util.List;
 
 public class WorldLoader {
